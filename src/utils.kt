@@ -1,3 +1,4 @@
+import kotlin.random.Random
 object Colors {
     const val RESET = "\u001B[0m"
     const val BLACK = "\u001B[30m"
@@ -25,4 +26,49 @@ fun <T> MutableList<T>.limitSize(limit: Int) {
     while (size > limit) {
         removeAt(0)
     }
+}
+
+tailrec fun <T> chooseFrom(options: Array<T>, message: String = "Please, choose one from the following options: "): T {
+    println(message)
+    val optionList = options
+        .mapIndexed { i, v -> "${i+1}) $v" }
+        .joinToString(separator = "\n")
+    println(optionList)
+    val choice = getNaturalNumber("Your choice (index): ")
+    if (choice <= options.size) return options[choice - 1]
+    println("Your choice \"$choice\" is not in range. ")
+    return chooseFrom(options, message)
+}
+
+object RandomProcessGenerator {
+    private val extensions = arrayOf(".py", ".rb", ".exs", ".kt", ".sh", ".js")
+    private val filenames = arrayOf("program", "script", "file", "virus", "app", "main")
+    private var currentId = 0
+
+    private fun getRandomName(): String {
+        val name = filenames.random()
+        val index = Random.nextInt(10) + 1
+        val ext = extensions.random()
+        return "$name$index$ext"
+    }
+
+    fun get(): Process {
+        val name = getRandomName()
+        val id = currentId++
+        val size = Random.nextInt(90) + 10
+        return Process(name, id, size)
+    }
+}
+
+inline fun maybe(chance: Int, action: () -> Unit) {
+    if (Random.nextInt(100) < chance) {
+        action()
+    }
+}
+
+fun clearTerminal() {
+    val runtime = Runtime.getRuntime()
+    val os = System.getProperty("os.name").toLowerCase()
+    val command = if (os.contains("win")) "cmd /c cls" else "clear"
+    runtime.exec(command)
 }

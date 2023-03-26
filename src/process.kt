@@ -29,7 +29,7 @@ class Process(private val name: String, val id: Int, val size: Int) {
     override fun toString(): String {
         val nameLabel = "${Colors.PURPLE}$name (ID $id)${Colors.RESET}"
         val setLabel = "|WS| = ${Colors.RED}$workingSetSize${Colors.RESET}"
-        val faultRateFormatted = "%.2f".format(faultRate * 100).plus("5")
+        val faultRateFormatted = "%.2f".format(faultRate * 100).plus("%")
         val faultLabel = "Fault Rate = ${Colors.YELLOW}$faultRateFormatted${Colors.RESET}"
         return "$nameLabel: $memory, $setLabel, $faultLabel"
     }
@@ -71,7 +71,7 @@ private class Memory {
 
     override fun toString() =
         frames.joinToString(separator = "") {
-            "[${Colors.CYAN}$it${Colors.RESET}]"
+            "[${Colors.CYAN}${it.second}${Colors.RESET}]"
         }
 }
 

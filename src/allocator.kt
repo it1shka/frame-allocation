@@ -1,3 +1,5 @@
+import kotlin.math.sqrt
+
 private val colors = arrayOf(
     Colors.BLUE,
     Colors.CYAN, Colors.PURPLE,
@@ -22,14 +24,33 @@ abstract class Allocator(protected val totalFrames: Int) {
             return false
         }
         allocateForProcess(process, freeSpace)
+        processes.add(process)
         return true
     }
 
     fun deallocateProcess(process: Process) {
         process
             .deallocate(Int.MAX_VALUE)
-            .forEach { allocatedMemory.remove(it) }
+            .forEach(allocatedMemory::remove)
         processes.remove(process)
+    }
+
+    protected fun reallocate(allocation: Map<Process, Int>) {
+        allocation
+            .filter { (process, space) -> process.allocatedSpace > space }
+            .forEach { (process, space) ->
+                val delta = process.allocatedSpace - space
+                if (process.allocatedSpace - delta < minimalFrameRequirement) return
+                process.deallocate(delta).forEach(allocatedMemory::remove)
+            }
+
+        allocation
+            .filter { (process, space) -> process.allocatedSpace < space }
+            .forEach { (process, space) ->
+                val delta = space - process.allocatedSpace
+                val frames = requestFreeFrames(delta)
+                allocateForProcess(process, frames)
+            }
     }
 
     abstract fun balanceAllocatedFrames()
@@ -68,8 +89,10 @@ abstract class Allocator(protected val totalFrames: Int) {
                 "${colors[tag % colors.size]}$tag${Colors.RESET}"
             }
         }
-        .chunked(20)
-        .joinToString(separator = "\n")
+        .chunked(sqrt(totalFrames.toDouble()).toInt())
+        .joinToString(separator = "\n") {
+            it.joinToString(separator = "")
+        }
 
     val processDump get() = processes
         .mapIndexed{ index, process -> "${index+1}) $process"}
