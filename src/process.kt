@@ -27,11 +27,11 @@ class Process(private val name: String, val id: Int, val size: Int) {
     }
 
     override fun toString(): String {
-        val nameLabel = "${Colors.PURPLE}$name (ID $id)${Colors.RESET}"
+        val nameLabel = "${Colors.PURPLE}$name (ID $id)${Colors.RESET}:".pad(30)
         val setLabel = "|WS| = ${Colors.RED}$workingSetSize${Colors.RESET}"
         val faultRateFormatted = "%.2f".format(faultRate * 100).plus("%")
         val faultLabel = "Fault Rate = ${Colors.YELLOW}$faultRateFormatted${Colors.RESET}"
-        return "$nameLabel: $memory, $setLabel, $faultLabel"
+        return "$nameLabel $setLabel, $faultLabel"
     }
 }
 

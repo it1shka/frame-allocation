@@ -1,5 +1,3 @@
-import kotlin.random.Random
-
 val allocatorTypes = arrayOf("EQ", "RAND")
 
 fun createAllocator(allocatorType: String, frames: Int) =
@@ -11,7 +9,7 @@ fun createAllocator(allocatorType: String, frames: Int) =
 
 object Scheduler {
     private const val minAmount = 5
-    private const val maxAmount = 10
+    private const val maxAmount = 15
     private const val changeChance = 2
 
     fun initializeProcesses(allocator: Allocator) =
@@ -37,8 +35,9 @@ object Scheduler {
 }
 
 fun main() {
-    val framesAmount = getNaturalNumber("Total frames number: ")
-    val allocatorType = chooseFrom(allocatorTypes)
+    clearTerminal()
+    val framesAmount = getInteger("Total frames number: ", 49)
+    val allocatorType = chooseFrom(allocatorTypes, "Select allocator: ")
     val allocator = createAllocator(allocatorType, framesAmount)
 
     val processes = Scheduler.initializeProcesses(allocator)

@@ -8,6 +8,7 @@ private val colors = arrayOf(
 )
 
 abstract class Allocator(protected val totalFrames: Int) {
+    protected val chunkSize = sqrt(totalFrames.toDouble()).times(1.5).toInt()
     protected val minimalFrameRequirement = 2
     protected val processes = mutableListOf<Process>()
     protected val allocatedMemory = HashMap<Int, Int>()
@@ -86,10 +87,10 @@ abstract class Allocator(protected val totalFrames: Int) {
             if (tag == null) {
                 "${Colors.BLACK}X${Colors.RESET}"
             } else {
-                "${colors[tag % colors.size]}$tag${Colors.RESET}"
+                "${colors[tag % colors.size]}0${Colors.RESET}"
             }
         }
-        .chunked(sqrt(totalFrames.toDouble()).toInt())
+        .chunked(chunkSize)
         .joinToString(separator = "\n") {
             it.joinToString(separator = "")
         }

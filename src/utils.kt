@@ -1,4 +1,6 @@
 import kotlin.random.Random
+import kotlin.math.max
+
 object Colors {
     const val RESET = "\u001B[0m"
     const val BLACK = "\u001B[30m"
@@ -11,15 +13,19 @@ object Colors {
     const val WHITE = "\u001B[37m"
 }
 
-tailrec fun getNaturalNumber(prompt: String?): Int {
-    print(prompt ?: "Please, enter a natural number: ")
+tailrec fun getInteger(prompt: String?, bound: Int = 0): Int {
+    print(prompt ?: "Please, enter integer: ")
     val input = readln().trim()
     val maybeInt = input.toIntOrNull()
-    if (maybeInt != null && maybeInt > 0) {
-        return maybeInt;
+    if (maybeInt != null && maybeInt > bound) {
+        return maybeInt
     }
-    println("\"$input\" is not a natural number. ")
-    return getNaturalNumber(prompt)
+    if (maybeInt == null) {
+        println("\"$input\" is not an integer at all. ")
+    } else {
+        println("\"$input\" is less than specified bound $bound. ")
+    }
+    return getInteger(prompt, bound)
 }
 
 fun <T> MutableList<T>.limitSize(limit: Int) {
@@ -34,7 +40,7 @@ tailrec fun <T> chooseFrom(options: Array<T>, message: String = "Please, choose 
         .mapIndexed { i, v -> "${i+1}) $v" }
         .joinToString(separator = "\n")
     println(optionList)
-    val choice = getNaturalNumber("Your choice (index): ")
+    val choice = getInteger("Your choice (index): ")
     if (choice <= options.size) return options[choice - 1]
     println("Your choice \"$choice\" is not in range. ")
     return chooseFrom(options, message)
@@ -67,8 +73,8 @@ inline fun maybe(chance: Int, action: () -> Unit) {
 }
 
 fun clearTerminal() {
-    val runtime = Runtime.getRuntime()
-    val os = System.getProperty("os.name").toLowerCase()
-    val command = if (os.contains("win")) "cmd /c cls" else "clear"
-    runtime.exec(command)
+    print("\u001B[H\u001B[2J")
 }
+
+fun String.pad(size: Int) =
+    this + " ".repeat(max(size - length, 0))
