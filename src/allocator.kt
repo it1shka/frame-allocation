@@ -1,3 +1,4 @@
+import kotlin.math.min
 import kotlin.math.sqrt
 
 private val colors = arrayOf(
@@ -42,8 +43,9 @@ abstract class Allocator(protected val totalFrames: Int) {
             .filter { (process, space) -> process.allocatedSpace > space }
             .forEach { (process, space) ->
                 val delta = process.allocatedSpace - space
-                if (process.allocatedSpace - delta < minimalFrameRequirement) return
-                process.deallocate(delta).forEach(allocatedMemory::remove)
+                // if (process.allocatedSpace - delta < minimalFrameRequirement) return
+                val deallocationSize = min(process.allocatedSpace - minimalFrameRequirement, delta)
+                process.deallocate(deallocationSize).forEach(allocatedMemory::remove)
             }
 
         allocation
@@ -91,7 +93,8 @@ abstract class Allocator(protected val totalFrames: Int) {
             if (tag == null) {
                 "${Colors.BLACK}X${Colors.RESET}"
             } else {
-                "${colors[tag % colors.size]}0${Colors.RESET}"
+                val sign = if (tag < 16) tag.toString(16).uppercase() else "0"
+                "${colors[tag % colors.size]}$sign${Colors.RESET}"
             }
         }
         .chunked(chunkSize)

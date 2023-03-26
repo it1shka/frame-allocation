@@ -4,7 +4,9 @@ import kotlin.random.Random
 
 class Process(private val name: String, val id: Int, val size: Int) {
     val workingSetSize get() = workingSet.toSet().size
-    val faultRate get() = pageFaults.sum().toFloat() * 100.0 / pageFaults.size.toFloat()
+    val faultRate get() =
+        if (pageFaults.size == 0) 0.00
+        else pageFaults.sum().toFloat() * 100.0 / pageFaults.size.toFloat()
 
     private val referenceString = ReferenceStringGenerator.getPageSequence()
     private val workingSet = mutableListOf<Int>()
@@ -23,7 +25,7 @@ class Process(private val name: String, val id: Int, val size: Int) {
         workingSet.add(currentPage)
         // ensure size
         pageFaults.limitSize(10)
-        workingSet.limitSize(5 + size)
+        workingSet.limitSize(5 + size / 10)
     }
 
     override fun toString(): String {
@@ -58,6 +60,8 @@ private class Memory {
     }
 
     fun processPage(page: Int): Int {
+        // process paused and cannot accept page if it doesn't have enough space
+        if (frames.size <= 0) return 1
         useTime[page] = clock++
         if (frames.map{ it.second }.contains(page)) {
             return 0

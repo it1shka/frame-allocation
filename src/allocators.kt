@@ -25,7 +25,9 @@ class PageFaultFrequencyAllocator(totalFrames: Int): Allocator(totalFrames) {
     override fun estimateAllocation(): Map<Process, Int> {
         val totalFreq = processes.sumOf { it.faultRate }
         return processes.associateWith {
-            (it.faultRate / totalFreq * totalFrames.toFloat()).toInt()
+            // if total value is so small, then preserve the state
+            if (totalFreq < 5f) Int.MAX_VALUE
+            else (it.faultRate / totalFreq * totalFrames.toFloat()).toInt()
         }.toMap()
     }
 }
