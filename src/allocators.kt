@@ -23,9 +23,7 @@ class ProportionalAllocator(totalFrames: Int): Allocator(totalFrames) {
 
 class PageFaultFrequencyAllocator(totalFrames: Int): Allocator(totalFrames) {
     override fun estimateAllocation(): Map<Process, Int> {
-        val totalFreq = processes
-            .map { it.faultRate }
-            .sum()
+        val totalFreq = processes.sumOf { it.faultRate }
         return processes.associateWith {
             (it.faultRate / totalFreq * totalFrames.toFloat()).toInt()
         }.toMap()

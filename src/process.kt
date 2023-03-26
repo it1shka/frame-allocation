@@ -4,7 +4,7 @@ import kotlin.random.Random
 
 class Process(private val name: String, val id: Int, val size: Int) {
     val workingSetSize get() = workingSet.toSet().size
-    val faultRate get() = pageFaults.sum().toFloat() / pageFaults.size.toFloat()
+    val faultRate get() = pageFaults.sum().toFloat() * 100.0 / pageFaults.size.toFloat()
 
     private val referenceString = ReferenceStringGenerator.getPageSequence()
     private val workingSet = mutableListOf<Int>()
@@ -28,10 +28,11 @@ class Process(private val name: String, val id: Int, val size: Int) {
 
     override fun toString(): String {
         val nameLabel = "${Colors.PURPLE}$name (ID $id)${Colors.RESET}:".pad(30)
+        val sizeLabel = "Size = ${Colors.GREEN}$size${Colors.RESET}"
         val setLabel = "|WS| = ${Colors.RED}$workingSetSize${Colors.RESET}"
-        val faultRateFormatted = "%.2f".format(faultRate * 100).plus("%")
+        val faultRateFormatted = "%.2f".format(faultRate).plus("%")
         val faultLabel = "Fault Rate = ${Colors.YELLOW}$faultRateFormatted${Colors.RESET}"
-        return "$nameLabel $setLabel, $faultLabel"
+        return "$nameLabel $sizeLabel, $setLabel, $faultLabel"
     }
 }
 
