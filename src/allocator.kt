@@ -8,10 +8,11 @@ private val colors = arrayOf(
 )
 
 abstract class Allocator(protected val totalFrames: Int) {
-    protected val chunkSize = sqrt(totalFrames.toDouble()).times(1.5).toInt()
-    protected val minimalFrameRequirement = 2
+    private val chunkSize = sqrt(totalFrames.toDouble()).times(1.5).toInt()
+    private val minimalFrameRequirement = 2
+    private val allocatedMemory = HashMap<Int, Int>()
+
     protected val processes = mutableListOf<Process>()
-    protected val allocatedMemory = HashMap<Int, Int>()
 
     // main interface
 
@@ -36,7 +37,7 @@ abstract class Allocator(protected val totalFrames: Int) {
         processes.remove(process)
     }
 
-    protected fun reallocate(allocation: Map<Process, Int>) {
+    private fun reallocate(allocation: Map<Process, Int>) {
         allocation
             .filter { (process, space) -> process.allocatedSpace > space }
             .forEach { (process, space) ->
@@ -54,15 +55,18 @@ abstract class Allocator(protected val totalFrames: Int) {
             }
     }
 
-    abstract fun balanceAllocatedFrames()
+    fun balanceAllocatedFrames() =
+        reallocate(estimateAllocation())
+
+    abstract fun estimateAllocation(): Map<Process, Int>
 
     // helping functions
 
-    protected fun requestFreeFrames(amount: Int) = (0 until totalFrames)
+    private fun requestFreeFrames(amount: Int) = (0 until totalFrames)
         .filter { !allocatedMemory.contains(it) }
         .take(amount)
 
-    protected fun forceDeallocation(amount: Int): List<Int> {
+    private fun forceDeallocation(amount: Int): List<Int> {
         processes
             .filter { it.allocatedSpace > minimalFrameRequirement }
         val deallocated = mutableListOf<Int>()
@@ -74,7 +78,7 @@ abstract class Allocator(protected val totalFrames: Int) {
         return deallocated
     }
 
-    protected fun allocateForProcess(process: Process, frames: List<Int>) {
+    private fun allocateForProcess(process: Process, frames: List<Int>) {
         process.allocate(frames)
         frames.forEach { allocatedMemory[it] = process.id }
     }
@@ -96,6 +100,6 @@ abstract class Allocator(protected val totalFrames: Int) {
         }
 
     val processDump get() = processes
-        .mapIndexed{ index, process -> "${index+1}) $process"}
+        .mapIndexed{ index, process -> "${colors[process.id % colors.size]}${index+1})${Colors.RESET} $process"}
         .joinToString(separator = "\n")
 }

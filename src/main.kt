@@ -1,9 +1,12 @@
-val allocatorTypes = arrayOf("EQ", "RAND")
+val allocatorTypes = arrayOf("EQ", "RAND", "PROP", "FAULT", "WORKSET")
 
 fun createAllocator(allocatorType: String, frames: Int) =
     when (allocatorType) {
         "EQ" -> EqualAllocator(frames)
         "RAND" -> RandomAllocator(frames)
+        "PROP" -> ProportionalAllocator(frames)
+        "FAULT" -> PageFaultFrequencyAllocator(frames)
+        "WORKSET" -> WorkingSetAllocator(frames)
         else -> throw RuntimeException("No such allocator called \"$allocatorType\"")
     }
 
