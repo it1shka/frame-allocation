@@ -14,6 +14,11 @@ abstract class Allocator(protected val totalFrames: Int) {
     private val allocatedMemory = HashMap<Int, Int>()
 
     protected val processes = mutableListOf<Process>()
+    // used for window display
+    val memoryMatrix get() =
+        (0 until totalFrames)
+            .map(allocatedMemory::get)
+            .chunked(chunkSize)
 
     // main interface
 

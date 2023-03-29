@@ -23,7 +23,7 @@ tailrec fun getInteger(prompt: String?, bound: Int = 0): Int {
     if (maybeInt == null) {
         println("\"$input\" is not an integer at all. ")
     } else {
-        println("\"$input\" is less than specified bound $bound. ")
+        println("\"$input\" should be greater than $bound. ")
     }
     return getInteger(prompt, bound)
 }

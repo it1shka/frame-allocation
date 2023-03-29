@@ -42,14 +42,11 @@ fun main() {
     val framesAmount = getInteger("Total frames number: ", 49)
     val allocatorType = chooseFrom(allocatorTypes, "Select allocator: ")
     val allocator = createAllocator(allocatorType, framesAmount)
-
     val processes = Scheduler.initializeProcesses(allocator)
 
+    val display = getDisplay()
     while (true) {
-        clearTerminal()
-        println(allocator.memoryDump)
-        println()
-        println(allocator.processDump)
+        display.update(allocator)
 
         allocator.balanceAllocatedFrames()
         processes.forEach(Process::execute)
